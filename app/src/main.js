@@ -41,7 +41,7 @@ function describe(action) {
   switch (k) {
     case "CreateProject": {
       const tot = a.milestones.reduce((s, x) => s + Number(x), 0);
-      return `Create project “${esc(a.title)}” · ${xlm(tot)} XLM over ${a.milestones.length} milestones`;
+      return `Create project “${esc(a.title)}” · ${xlm(tot)} XLM over ${a.milestones.length} milestone${a.milestones.length === 1 ? "" : "s"}`;
     }
     case "CancelProject": return `Cancel project #${a}`;
     case "VoidMilestone": return `Void certification of milestone ${Number(v[1]) + 1} on project #${v[0]}`;
@@ -94,7 +94,7 @@ async function loadProject(i) {
     <div class="projh"><div><div class="small">Project #${i}</div><h3>${esc(cfg.title)}</h3></div><span class="badge ${cls}">${st}</span></div>
     <div class="facts"><span>Budget <b>${xlm(cfg.total)} XLM</b></span><span>Recipient <b>${who(cfg.contractor)}</b></span><span>Reviewers <b>${cfg.inspector_threshold} of ${cfg.inspectors.length}</b></span><span>Retention <b>${cfg.retention_bps / 100}%</b></span><span>Challenge <b>${dur(cfg.challenge_secs)}</b></span><span>Defects period <b>${dur(cfg.defects_secs)}</b></span></div>
     <div class="bar"><i class="paid" style="width:${paidPct}%"></i><i class="ret" style="width:${retPct}%"></i></div>
-    <div class="legend small"><span><i class="paid"></i>Paid ${xlm(sum.paid)}</span><span><i class="ret"></i>Retained ${xlm(sum.retained)}</span><span>Held in vault ${xlm(sum.balance)}</span>${st === "Cancelled" ? "<span>Unspent budget returned to treasury</span>" : ""}</div>
+    <div class="legend small"><span><i class="paid"></i>Paid ${xlm(sum.paid)}</span><span><i class="ret"></i>${st === "Completed" && Number(sum.retained) === 0 ? `Retention released after defects period: ${xlm(Number(cfg.total) - Number(sum.paid))}` : `Retained ${xlm(sum.retained)}`}</span><span>Held in vault ${xlm(sum.balance)}</span>${st === "Cancelled" ? "<span>Unspent budget returned to treasury</span>" : ""}</div>
     <div class="mss">${rows}</div>
     <div class="small mono addr">Vault <a href="${EXP}/contract/${V}" target="_blank" rel="noopener">${V}</a></div>
   </article>` };
