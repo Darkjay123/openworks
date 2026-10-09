@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OpenWorks · Milestone treasury on Stellar</title>
+<meta name="description" content="Council-governed milestone treasury on Stellar Soroban. Every payment verified, every unit traceable." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+<header class="nav"><div class="wrap navin">
+  <div class="brand"><span class="logo">◆</span> Open<b>Works</b></div>
+  <nav><a href="#ledger">Live ledger</a><a href="#projects">Projects</a><a href="#how">How it works</a><a href="#proof">On-chain run</a><a class="gh" href="https://github.com/Darkjay123/openworks" target="_blank" rel="noopener">GitHub ↗</a></nav>
+</div></header>
+
+<section class="hero"><div class="wrap">
+  <div class="pill"><span class="dot"></span> Live on Stellar testnet · Soroban · Protocol 28</div>
+  <h1>Fund projects.<br/><span class="grad">Pay only for verified work.</span></h1>
+  <p class="lead">OpenWorks is a milestone treasury for anyone who funds projects: grant programs, NGOs, companies paying vendors, public bodies. A council approves spending with on-chain multisig. Each project gets its own vault. Money moves one milestone at a time, after independent reviewers sign off, and unspent funds can only return to the treasury.</p>
+  <div class="cta"><a class="btn primary" href="#ledger">See the live ledger</a><a class="btn ghost" href="https://github.com/Darkjay123/openworks" target="_blank" rel="noopener">Read the contracts</a></div>
+  <div class="kpis" id="kpis">
+    <div class="kpi"><b id="k-dep">…</b><span>XLM deposited by funders</span></div>
+    <div class="kpi"><b id="k-com">…</b><span>XLM committed to projects</span></div>
+    <div class="kpi"><b id="k-paid">…</b><span>XLM paid for verified work</span></div>
+    <div class="kpi"><b id="k-bal">…</b><span>XLM back in the treasury</span></div>
+  </div>
+</div></section>
+
+<section id="ledger" class="sec"><div class="wrap">
+  <div class="eyebrow">01 · Live treasury</div>
+  <h2 id="t-name">Reading the treasury from the network…</h2>
+  <p class="sub">Everything on this page is fetched right now from Stellar testnet. No backend, no database: the contracts are the source of truth.</p>
+  <div class="grid2">
+    <div class="card">
+      <div class="cardh">Council <span class="tag" id="t-thr"></span></div>
+      <div id="t-council" class="list"></div>
+      <div class="small">Timelock <b id="t-tl"></b> after approval · Proposals expire after <b id="t-ttl"></b></div>
+    </div>
+    <div class="card">
+      <div class="cardh">Proposals <span class="tag" id="t-pc"></span></div>
+      <div id="t-props" class="list"></div>
+    </div>
+  </div>
+  <div class="small mono addr">Treasury contract <a id="t-link" target="_blank" rel="noopener"></a></div>
+</div></section>
+
+<section id="projects" class="sec alt"><div class="wrap">
+  <div class="eyebrow">02 · Project vaults</div>
+  <h2>One contract per project, deployed by the treasury</h2>
+  <p class="sub">Each milestone shows its state, submission round, reviewer votes and the fingerprint of the evidence the recipient submitted.</p>
+  <div id="projects-list"></div>
+</div></section>
+
+<section id="how" class="sec"><div class="wrap">
+  <div class="eyebrow">03 · Where funding leaks, and what the contracts enforce</div>
+  <h2>Rules in code, not in policy</h2>
+  <div class="grid3">
+    <div class="rule"><i>⚖︎</i><h4>No single approver</h4><p>M-of-N council signatures, then a timelock that starts when the threshold is reached. Anyone can execute once it passes.</p></div>
+    <div class="rule"><i>✓</i><h4>Verify before paying</h4><p>k-of-n independent reviewers certify each milestone, strictly in order. The recipient can never review their own work.</p></div>
+    <div class="rule"><i>◷</i><h4>Public challenge window</h4><p>After certification there is a window in which the council can void it. The contract refuses to create a project whose window is shorter than the council's timelock.</p></div>
+    <div class="rule"><i>⛨</i><h4>Retention for defects</h4><p>A share of each payment is held until a defects-liability period ends. The council can forfeit it for defects inside that period.</p></div>
+    <div class="rule"><i>⇄</i><h4>No way to divert funds</h4><p>There is no "send to address" action. Treasury money can only enter a vault; a vault can only pay its recipient or refund the treasury.</p></div>
+    <div class="rule"><i>↺</i><h4>Cancel means refund</h4><p>Cancelling a project returns every unspent unit to the treasury in the same transaction. Earned retention stays owed.</p></div>
+  </div>
+  <div class="flow">
+    <div class="node">Funders</div><div class="arr">deposit →</div>
+    <div class="node strong">Treasury<br/><small>council multisig + timelock</small></div><div class="arr">deploy + fund →</div>
+    <div class="node strong">Project vault<br/><small>Pending → Submitted → Certified → Released</small></div><div class="arr">pay →</div>
+    <div class="node">Recipient</div>
+  </div>
+  <p class="small">Use cases: ecosystem grants paid in tranches, NGO field disbursements, agency contracts paid by deliverable, public works.</p>
+</div></section>
+
+<section id="proof" class="sec alt"><div class="wrap">
+  <div class="eyebrow">04 · Full lifecycle, every call real</div>
+  <h2>The run that produced this ledger</h2>
+  <p class="sub">Green rows went through. Red rows are attacks or out-of-order calls that the contracts refused on-chain.</p>
+  <div id="log" class="log"></div>
+</div></section>
+
+<footer class="foot"><div class="wrap">
+  <span>Built by <a href="https://github.com/Darkjay123" target="_blank" rel="noopener">John Enechukwu</a> · Rust + Soroban SDK 28 · 28 tests</span>
+  <span>Testnet demo. Not audited. Don't use with real funds until independently reviewed.</span>
+</div></footer>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
