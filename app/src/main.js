@@ -53,7 +53,7 @@ function describe(action) {
 async function loadTreasury() {
   const T = ENV.TREASURY;
   const [cfg, council, thr, budget, pc] = await Promise.all([read(T, "config"), read(T, "council"), read(T, "threshold"), read(T, "budget"), read(T, "proposal_count")]);
-  $("t-name").textContent = cfg.name.replace(" (testnet demo)", "");
+  $("t-name").textContent = "Demo programme: " + cfg.name.replace(" (testnet demo)", "");
   $("t-thr").textContent = `${thr} of ${council.length} to approve`;
   $("t-tl").textContent = dur(cfg.timelock_secs);
   $("t-ttl").textContent = dur(cfg.proposal_ttl_secs);
@@ -66,8 +66,10 @@ async function loadTreasury() {
   const props = await Promise.all([...Array(Number(pc)).keys()].map((i) => read(T, "proposal", u32(i))));
   $("t-props").innerHTML = props.map((p) => {
     const st = tag(p.status);
-    const label = st === "Executed" ? "Executed" : Number(p.approved_at) ? "Approved, not run" : "Open";
-    const cls = st === "Executed" ? "ok" : Number(p.approved_at) ? "warn" : "muted";
+    const k = tag(p.action), a = Array.isArray(p.action) ? p.action[1] : p.action[k];
+    const over = k === "CreateProject" && a.milestones.reduce((s, x) => s + Number(x), 0) > Number(budget.balance);
+    const label = st === "Executed" ? "Executed" : over ? "Refused: over budget" : Number(p.approved_at) ? "Approved, not run" : "Open";
+    const cls = st === "Executed" ? "ok" : over ? "bad" : Number(p.approved_at) ? "warn" : "muted";
     return `<div class="prop"><div class="pid">#${p.id}</div><div class="pbody"><div>${describe(p.action)}</div><div class="small">Signed by ${p.approvals.map(who).join(" + ")}</div></div><span class="badge ${cls}">${label}</span></div>`;
   }).join("");
   return Number(budget.project_count);
@@ -101,7 +103,7 @@ async function loadProject(i) {
 function renderLog() {
   $("log").innerHTML = LOG.map((r) => {
     const code = (r.err.match(/#(\d+)/) || [])[1];
-    const isTreasury = /execute|approve|propose|Non-member|Council|council|Execute/i.test(r.step) && !/release/i.test(r.step);
+    const isTreasury = /execute|approve|propose|Non-member|Council|council|Execute|budget/i.test(r.step) && !/release/i.test(r.step);
     const why = code ? ((isTreasury ? TREAS_ERR : VAULT_ERR)[code] || (VAULT_ERR[code] || TREAS_ERR[code]) || r.err) : "";
     return `<div class="lrow ${r.ok ? "ok" : "bad"}"><span class="ico">${r.ok ? "✓" : "✕"}</span><span class="lstep">${esc(r.step)}</span>${r.ok && r.tx ? `<a class="mono" href="${r.tx}" target="_blank" rel="noopener">tx ${r.tx.split("/").pop().slice(0, 8)}… ↗</a>` : `<span class="why">${esc(why)}</span>`}</div>`;
   }).join("");
